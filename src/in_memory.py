@@ -1,0 +1,102 @@
+from __future__ import annotations
+import dataclasses
+from abc import abstractmethod, ABC
+from dataclasses import dataclass
+from typing import Annotated, Generic, TypeVar, Protocol, ClassVar, Dict, Any, Type, Self
+
+from pydantic import BaseModel
+
+_TId = TypeVar("_TId")
+
+
+class _Entity(Protocol):
+
+    @property
+    @abstractmethod
+    def id(self) -> _TId:
+        pass
+
+
+_TEntity = TypeVar("_TEntity")
+
+
+
+class InMemoryRepositoryMetaclass(type):
+
+    # def __init__(self, model: Type[BaseModel]) -> None:
+    #     self._model = model
+    #     self._store: dict[_TId, _TEntity] = {}
+    #     self._create_find_by_methods()
+
+    def __new__(cls: Type[InMemoryRepositoryMetaclass], name: str, bases: tuple, class_dict: dict[str, Any]) -> InMemoryRepositoryMetaclass:
+        result = super().__new__(cls, name, bases, class_dict)
+        if fields := class_dict.get("find_by_fields"):
+            for key in fields:
+                setattr(result, f'find_by_{key}', cls._make_find_by_method(key))
+
+        setattr(result, 'add', cls._make_add_method())
+
+        return result
+
+    @staticmethod
+    def _make_find_by_method(field_name: str) -> Any:
+        def find_by_method(self, value: Any) -> list[Any]:
+            return [entity for id_, entity in self._store.items() if getattr(entity, field_name) == value]
+
+        return find_by_method
+
+    @staticmethod
+    def _make_add_method() -> Any:
+        def add_method(self, entity: Any) -> Any:
+            #     # if entity.id in self._store:
+            #     #     raise EntityAlreadyExists(entity.id)s
+            self._store[entity.id] = entity
+
+        return add_method
+
+
+
+    # def add(self, entity: _TEntity) -> None:
+    #     # if entity.id in self._store:
+    #     #     raise EntityAlreadyExists(entity.id)
+    #     self._store[entity.id] = entity
+
+    # def retrieve(self, id_: Id) -> TEntity:
+    #     try:
+    #         return self._store[id_]
+    #     except KeyError as err:
+    #         raise CannotRetrieveEntity(id_) from err
+    #
+    # def update(self, entity: TEntity) -> None:
+    #     if entity.id not in self._store:
+    #         raise CannotRetrieveEntity(entity.id)
+    #     self._store[entity.id] = entity
+    #
+    # def delete(self, id_: Id) -> None:
+    #     if id_ not in self._store:
+    #         raise CannotRetrieveEntity(id_)
+    #     del self._store[id_]
+    #
+    # def all(self) -> List[TEntity]:
+    #     return list(self._store.values())
+
+
+class InMemoryRepository(metaclass=InMemoryRepositoryMetaclass):
+    find_by_fields: list[str] = ["id"]
+
+    def __init__(self) -> None:
+        self._test = "test"
+        self._store = {}
+
+
+class Test:
+
+    @property
+    def id(self) -> int:
+        return 1
+
+
+rep = InMemoryRepository()
+
+rep.add(Test())
+print(rep.find_by_id(1)[0].id)
