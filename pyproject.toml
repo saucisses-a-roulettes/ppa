@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "ppa"
+version = "0.2.0"
+description = ""
+authors = ["Saucisse À Roulette <gael.monachon.dev@gmail.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = {version = "^1.10.9"}
+
+[tool.poetry.group.dev.dependencies]
+pydantic = {extras = ["mypy"], version = "^1.10.9"}
+pytest = "^7.3.2"
+mypy = "^1.3.0"
+black = {extras = ["d"], version = "^23.3.0"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = 3.11
+files = "src/"
