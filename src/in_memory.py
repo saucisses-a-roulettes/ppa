@@ -34,7 +34,10 @@ class InMemoryRepositoryMetaclass(type):
             for key in fields:
                 setattr(result, f'find_by_{key}', cls._make_find_by_method(key))
 
-        setattr(result, 'add', cls._make_add_method())
+        if e := class_dict.get("entity_already_exists_exception"):
+            setattr(result, 'add', cls._make_add_method(e))
+        if e := class_dict.get("entity_not_found_exception"):
+            setattr(result, 'retrieve', cls._make_retrieve_method(e))
 
         return result
 
@@ -46,20 +49,26 @@ class InMemoryRepositoryMetaclass(type):
         return find_by_method
 
     @staticmethod
-    def _make_add_method() -> Any:
+    def _make_add_method(entity_already_exists_exception: Type[Exception]) -> Any:
         def add_method(self, entity: Any) -> Any:
-            #     # if entity.id in self._store:
-            #     #     raise EntityAlreadyExists(entity.id)s
+            if entity.id in self._store:
+                raise entity_already_exists_exception()
             self._store[entity.id] = entity
 
         return add_method
 
+    @staticmethod
+    def _make_retrieve_method(entity_not_found_exception: Type[Exception]) -> Any:
+        def retrieve_method(self, id_: Any) -> Any:
+            try:
+                return self._store[id_]
+            except KeyError as err:
+                raise entity_not_found_exception() from err
+        return retrieve_method
 
 
-    # def add(self, entity: _TEntity) -> None:
-    #     # if entity.id in self._store:
-    #     #     raise EntityAlreadyExists(entity.id)
-    #     self._store[entity.id] = entity
+
+
 
     # def retrieve(self, id_: Id) -> TEntity:
     #     try:
@@ -83,6 +92,8 @@ class InMemoryRepositoryMetaclass(type):
 
 class InMemoryRepository(metaclass=InMemoryRepositoryMetaclass):
     find_by_fields: list[str] = ["id"]
+    entity_already_exists_exception: Type[Exception] = ValueError
+    entity_not_found_exception: Type[Exception] = ValueError
 
     def __init__(self) -> None:
         self._test = "test"
@@ -100,3 +111,4 @@ rep = InMemoryRepository()
 
 rep.add(Test())
 print(rep.find_by_id(1)[0].id)
+print(rep.retrieve(1).id)

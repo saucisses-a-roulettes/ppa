@@ -8,8 +8,11 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pydantic = {extras = ["mypy"], version = "^1.10.9"}
+pydantic = {version = "^1.10.9"}
 
+
+[tool.poetry.group.dev.dependencies]
+pydantic = {extras = ["mypy"], version = "^1.10.9"}
 
 [build-system]
 requires = ["poetry-core"]
