@@ -38,6 +38,7 @@ class InMemoryRepositoryMetaclass(type):
             setattr(result, 'add', cls._make_add_method(e))
         if e := class_dict.get("entity_not_found_exception"):
             setattr(result, 'retrieve', cls._make_retrieve_method(e))
+            setattr(result, 'update', cls._make_update_method(e))
 
         return result
 
@@ -66,21 +67,19 @@ class InMemoryRepositoryMetaclass(type):
                 raise entity_not_found_exception() from err
         return retrieve_method
 
+    @staticmethod
+    def _make_update_method(entity_not_found_exception: Type[Exception]) -> Any:
+        def update_method(self, entity: Any) -> None:
+            if entity.id not in self._store:
+                raise entity_not_found_exception()
+            self._store[entity.id] = entity
+
+        return update_method
 
 
 
 
-    # def retrieve(self, id_: Id) -> TEntity:
-    #     try:
-    #         return self._store[id_]
-    #     except KeyError as err:
-    #         raise CannotRetrieveEntity(id_) from err
-    #
-    # def update(self, entity: TEntity) -> None:
-    #     if entity.id not in self._store:
-    #         raise CannotRetrieveEntity(entity.id)
-    #     self._store[entity.id] = entity
-    #
+
     # def delete(self, id_: Id) -> None:
     #     if id_ not in self._store:
     #         raise CannotRetrieveEntity(id_)
@@ -111,4 +110,5 @@ rep = InMemoryRepository()
 
 rep.add(Test())
 print(rep.find_by_id(1)[0].id)
+rep.update(Test())
 print(rep.retrieve(1).id)
