@@ -12,6 +12,7 @@ def User():
 
     return User
 
+
 @pytest.fixture
 def UserRepository(User):
     @in_memory_behavior
@@ -19,6 +20,7 @@ def UserRepository(User):
         pass
 
     return UserRepository()
+
 
 @pytest.mark.parametrize("entity_id, entity_name", [(1, "John"), (2, "Alice"), (3, "Bob")])
 def test_in_memory_behavior(UserRepository, User, entity_id, entity_name):

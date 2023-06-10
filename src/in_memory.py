@@ -1,14 +1,14 @@
 from typing import Any, Type
 
 
-def in_memory_behavior(cls):
-    class InMemoryRepository(cls):
+def in_memory_behavior(cls) -> Type:
+    class InMemoryRepository:
         find_by_fields: list[str] = ["id"]
         entity_already_exists_exception: Type[Exception] = ValueError
         entity_not_found_exception: Type[Exception] = ValueError
 
-        def __init__(self):
-            self._store = {}
+        def __init__(self) -> None:
+            self._store: dict[str, Any] = {}
             for key in self.find_by_fields:
                 setattr(self, f"find_by_{key}", self._make_find_by_method(key))
 
@@ -35,11 +35,7 @@ def in_memory_behavior(cls):
 
         def _make_find_by_method(self, field_name: str) -> Any:
             def find_by_method(value: Any) -> list[Any]:
-                return [
-                    entity
-                    for id_, entity in self._store.items()
-                    if getattr(entity, field_name) == value
-                ]
+                return [entity for id_, entity in self._store.items() if getattr(entity, field_name) == value]
 
             return find_by_method
 
