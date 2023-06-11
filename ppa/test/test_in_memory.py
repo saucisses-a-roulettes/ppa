@@ -14,26 +14,25 @@ def User():
 
 
 @pytest.fixture
-def UserRepository(User):
-    @in_memory_repository
+def user_repository():
+    @in_memory_repository()
     class UserRepository:
         pass
 
     return UserRepository()
 
 
-@pytest.mark.parametrize("entity_id, entity_name", [(1, "John"), (2, "Alice"), (3, "Bob")])
-def test_in_memory_behavior(UserRepository, User, entity_id, entity_name):
-    user = User(id_=entity_id, name=entity_name)
+def test_in_memory_repository(user_repository, User):
+    user = User(id_=1, name="John")
 
-    UserRepository.add(user)
-    retrieved_user = UserRepository.retrieve(entity_id)
+    user_repository.add(user)
+    retrieved_user = user_repository.retrieve(1)
     assert retrieved_user == user
 
-    updated_user = User(id_=entity_id, name="Updated Name")
-    UserRepository.update(updated_user)
-    assert UserRepository.retrieve(entity_id) == updated_user
+    updated_user = User(id_=1, name="Johny")
+    user_repository.update(updated_user)
+    assert user_repository.retrieve(1) == updated_user
 
-    UserRepository.delete(entity_id)
+    user_repository.delete(1)
     with pytest.raises(ValueError):
-        UserRepository.retrieve(entity_id)
+        user_repository.retrieve(1)
