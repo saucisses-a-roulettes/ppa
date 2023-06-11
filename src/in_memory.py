@@ -1,7 +1,7 @@
 from typing import Any, Type
 
 
-def in_memory_behavior(cls) -> Type:
+def in_memory_repository(cls) -> Type:
     class InMemoryRepository:
         find_by_fields: list[str] = ["id"]
         entity_already_exists_exception: Type[Exception] = ValueError
