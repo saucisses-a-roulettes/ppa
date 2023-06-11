@@ -4,7 +4,7 @@ version = "0.3.0"
 description = ""
 authors = ["Saucisse À Roulette <gael.monachon.dev@gmail.com>"]
 readme = "README.md"
-packages = [{include = "src"}]
+packages = [{include = "ppa"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -27,4 +27,4 @@ include = '\.pyi?$'
 
 [tool.mypy]
 python_version = 3.11
-files = "src/"
+files = "ppa/"

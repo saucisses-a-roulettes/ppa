@@ -1,6 +1,6 @@
 import pytest
 
-from src.in_memory import in_memory_repository
+from ppa.in_memory import in_memory_repository
 
 
 @pytest.fixture
