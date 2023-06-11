@@ -1,11 +1,14 @@
 from typing import Any, Type
 
 
-def in_memory_repository(cls) -> Type:
+def in_memory_repository(cls, entity_already_exists_exception: Type[Exception], entity_not_found_exception: Type[Exception]) -> Type:
+
+    e_already_exists = entity_already_exists_exception
+    e_not_found = entity_not_found_exception
     class InMemoryRepository:
         find_by_fields: list[str] = ["id"]
-        entity_already_exists_exception: Type[Exception] = ValueError
-        entity_not_found_exception: Type[Exception] = ValueError
+        entity_already_exists_exception: Type[Exception] = e_already_exists
+        entity_not_found_exception: Type[Exception] = e_not_found
 
         def __init__(self) -> None:
             self._store: dict[str, Any] = {}
