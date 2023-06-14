@@ -41,7 +41,7 @@ jobs:
         run: poetry install --no-interaction --no-root --with=dev
 
       - name: Check syntax
-        run: poetry run black src --check
+        run: poetry run black ppa --check
 
       - name: Check typing
         run : poetry run mypy
