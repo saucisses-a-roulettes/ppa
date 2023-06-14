@@ -7,13 +7,11 @@ def in_memory_repository(
     entity_already_exists_exception: Type[Exception] = ValueError,
     entity_not_found_exception: Type[Exception] = ValueError,
 ):
-    if find_by_fields is None:
-        find_by_fields = []
     def decorator(cls) -> Type:
         class InMemoryRepository(cls):
             def __init__(self) -> None:
                 self._store: dict[str, Any] = {}
-                for key in find_by_fields:
+                for key in find_by_fields or []:
                     setattr(self, f"find_by_{key}", self._make_find_by_method(key))
 
             def add(self, entity: Any) -> Any:
