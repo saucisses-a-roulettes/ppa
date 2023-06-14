@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from ppa.in_memory import in_memory_repository
+from src.in_memory import in_memory_repository
 
 
 class User:
