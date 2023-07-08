@@ -1,13 +1,14 @@
 from collections.abc import Iterable
-from typing import Any, Type
+from typing import Any, Type, TypeVar
 
+T = TypeVar("T")
 
 def in_memory_repository(
     find_by_fields: Iterable[str] | None = None,
     entity_already_exists_exception: Type[Exception] = ValueError,
     entity_not_found_exception: Type[Exception] = ValueError,
 ):
-    def decorator(cls) -> Type:
+    def decorator(cls: T) -> T:
         class InMemoryRepository(cls):
             def __init__(self) -> None:
                 self._store: dict[str, Any] = {}
